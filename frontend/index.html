@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Sorting Dashboard | DSA Mini Project</title>
+  <meta name="description" content="Demonstrates Merge Sort and Quick Sort algorithms on a live student dataset using a C backend." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════  HEADER  ══════════════════ -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-icon">⟨/⟩</div>
+        <div>
+          <h1 class="brand-title">Student Sorting Dashboard</h1>
+          <p class="brand-sub">DSA Mini Project &mdash; Merge Sort &amp; Quick Sort in C</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-c">C Backend</span>
+        <span class="badge badge-node">Node.js Bridge</span>
+        <span class="badge badge-js">Vanilla JS</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════  MAIN  ══════════════════ -->
+  <main class="app-main">
+
+    <!-- ── Algorithm Info Cards ── -->
+    <section class="algo-cards" aria-label="Algorithm Complexity">
+      <div class="algo-card algo-merge">
+        <div class="algo-icon">⚙</div>
+        <div class="algo-info">
+          <h2 class="algo-name">Merge Sort</h2>
+          <ul class="algo-details">
+            <li><span>Time:</span> O(n log n) <em>always</em></li>
+            <li><span>Space:</span> O(n) auxiliary</li>
+            <li><span>Stable:</span> Yes</li>
+            <li><span>Strategy:</span> Divide &amp; Conquer</li>
+          </ul>
+        </div>
+      </div>
+      <div class="algo-card algo-quick">
+        <div class="algo-icon">⚡</div>
+        <div class="algo-info">
+          <h2 class="algo-name">Quick Sort</h2>
+          <ul class="algo-details">
+            <li><span>Time:</span> O(n log n) <em>avg</em> / O(n²) worst</li>
+            <li><span>Space:</span> O(log n) stack</li>
+            <li><span>Stable:</span> No</li>
+            <li><span>Strategy:</span> Partition &amp; Conquer</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Main Content Grid ── -->
+    <div class="content-grid">
+
+      <!-- ── Left: Add Student Form ── -->
+      <aside class="panel panel-form">
+        <div class="panel-header">
+          <span class="panel-icon">➕</span>
+          <h2>Add Student</h2>
+        </div>
+
+        <form id="addStudentForm" novalidate>
+          <div class="form-group">
+            <label for="studentName">Student Name</label>
+            <input
+              type="text"
+              id="studentName"
+              placeholder="e.g. Alice Sharma"
+              autocomplete="off"
+              required
+            />
+            <span class="field-hint">Full name of the student</span>
+          </div>
+
+          <div class="form-group">
+            <label for="rollNumber">Roll Number</label>
+            <input
+              type="number"
+              id="rollNumber"
+              placeholder="e.g. 101"
+              min="1"
+              max="9999"
+              required
+            />
+            <span class="field-hint">Unique roll number (1–9999)</span>
+          </div>
+
+          <div class="form-group">
+            <label for="marks">
+              Marks
+              <span id="marksDisplay" class="marks-badge">—</span>
+            </label>
+            <input
+              type="number"
+              id="marks"
+              placeholder="e.g. 85"
+              min="0"
+              max="100"
+              required
+            />
+            <input
+              type="range"
+              id="marksSlider"
+              min="0"
+              max="100"
+              value="75"
+              class="marks-slider"
+              aria-label="Marks slider"
+            />
+            <span class="field-hint">Out of 100</span>
+          </div>
+
+          <div id="formError" class="form-error" role="alert" hidden></div>
+
+          <button type="submit" class="btn btn-primary" id="addStudentBtn">
+            <span class="btn-icon">+</span> Add Student
+          </button>
+        </form>
+
+        <div class="quick-add-section">
+          <p class="quick-add-label">Quick Load (Demo Data)</p>
+          <button class="btn btn-ghost" id="loadDemoBtn">Load 6 Demo Students</button>
+        </div>
+
+        <div class="clear-section">
+          <button class="btn btn-danger-ghost" id="clearAllBtn">🗑 Clear All</button>
+        </div>
+      </aside>
+
+      <!-- ── Right: Table + Sort Controls ── -->
+      <section class="panel panel-table">
+        <div class="panel-header">
+          <div class="panel-header-left">
+            <span class="panel-icon">📋</span>
+            <h2>Student Records</h2>
+            <span class="count-badge" id="studentCount">0 students</span>
+          </div>
+          <div class="sort-controls">
+            <button class="btn btn-merge" id="mergeSortBtn" disabled>
+              ⚙ Merge Sort
+            </button>
+            <button class="btn btn-quick" id="quickSortBtn" disabled>
+              ⚡ Quick Sort
+            </button>
+          </div>
+        </div>
+
+        <!-- Status bar -->
+        <div id="statusBar" class="status-bar status-idle">
+          <span id="statusText">Add students to get started.</span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+          <table class="student-table" id="studentTable" aria-label="Student records">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Roll No.</th>
+                <th>Marks</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody">
+              <tr class="empty-row" id="emptyRow">
+                <td colspan="5">
+                  <div class="empty-state">
+                    <div class="empty-icon">🎓</div>
+                    <p>No students yet. Add one using the form!</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Sorting legend -->
+        <div class="table-footer">
+          <span class="legend-item legend-highlight">Highlighted = Sorted result</span>
+          <span class="legend-separator">|</span>
+          <span class="legend-item">Sorted by: Marks ↓, Roll No. ↑</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- ── Step-by-Step Animated Visualizer ── -->
+    <section class="panel panel-viz" id="vizPanel" hidden>
+
+      <!-- Header -->
+      <div class="panel-header">
+        <span class="panel-icon">🎬</span>
+        <h2 id="vizTitle">Step-by-Step Visualization</h2>
+        <button class="btn-close" id="closeVizBtn" aria-label="Close visualization">✕</button>
+      </div>
+
+      <!-- Algorithm info strip -->
+      <div class="viz-sort-info" id="vizSortInfo"></div>
+
+      <!-- Animation controls -->
+      <div class="viz-controls">
+        <button class="viz-btn" id="vizRestart" title="Restart">⏮</button>
+        <button class="viz-btn viz-btn-play" id="vizPlayPause" title="Play/Pause">▶ Play</button>
+        <button class="viz-btn" id="vizStepBack" title="Step Back">◀</button>
+        <button class="viz-btn" id="vizStepFwd" title="Step Forward">▶</button>
+
+        <div class="viz-speed-group">
+          <label for="vizSpeed">Speed:</label>
+          <select id="vizSpeed">
+            <option value="900">Slow</option>
+            <option value="400" selected>Medium</option>
+            <option value="120">Fast</option>
+          </select>
+        </div>
+
+        <div class="viz-step-counter">
+          Step <span id="vizStepNum">0</span> / <span id="vizStepTotal">0</span>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="viz-progress-wrap">
+        <div class="viz-progress-fill" id="vizProgressFill"></div>
+      </div>
+
+      <!-- Current step description -->
+      <div class="viz-description" id="vizDescription">Press ▶ Play to start the animation.</div>
+
+      <!-- Bar chart -->
+      <div class="viz-bars" id="vizBars" aria-label="Animated bar chart of student marks"></div>
+
+      <!-- Color legend -->
+      <div class="viz-legend">
+        <span class="legend-dot dot-default"></span><span>Unsorted</span>
+        <span class="legend-dot dot-left-sub"></span><span id="legendLeft">Left sub-array</span>
+        <span class="legend-dot dot-right-sub"></span><span id="legendRight">Right sub-array</span>
+        <span class="legend-dot dot-comparing"></span><span>Comparing</span>
+        <span class="legend-dot dot-swap"></span><span id="legendSwap">Swapping</span>
+        <span class="legend-dot dot-pivot"></span><span id="legendPivot">Pivot</span>
+        <span class="legend-dot dot-sorted"></span><span>Sorted</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════  FOOTER  ══════════════════ -->
+  <footer class="app-footer">
+    <p>
+      DAA Mini Project &mdash; Sorting Algorithms in C &nbsp;|&nbsp;
+      <code>Merge Sort</code> &amp; <code>Quick Sort</code> &nbsp;|&nbsp;
+      Backend: C &nbsp;•&nbsp; Bridge: Node.js &nbsp;•&nbsp; Frontend: Vanilla JS
+    </p>
+  </footer>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
