@@ -14,13 +14,13 @@
  * and placed inside ../backend/ before starting this server.
  */
 
-const express  = require('express');
-const cors     = require('cors');
+const express = require('express');
+const cors = require('cors');
 const { spawn } = require('child_process');
-const path     = require('path');
-const fs       = require('fs');
+const path = require('path');
+const fs = require('fs');
 
-const app  = express();
+const app = express();
 const PORT = 3000;
 
 /* ── Middleware ──────────────────────────────────────────────── */
@@ -34,9 +34,9 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 let students = [];   /* Array of { name, roll, marks } objects   */
 
 /* ── Path to compiled C executables ─────────────────────────── */
-const BACKEND_DIR  = path.join(__dirname, '..', 'backend');
-const MERGE_EXE    = path.join(BACKEND_DIR, 'merge_sort.exe');
-const QUICK_EXE    = path.join(BACKEND_DIR, 'quick_sort.exe');
+const BACKEND_DIR = path.join(__dirname, '..', 'backend');
+const MERGE_EXE = path.join(BACKEND_DIR, 'merge_sort.exe');
+const QUICK_EXE = path.join(BACKEND_DIR, 'quick_sort.exe');
 
 /* ── Helper: run a C executable with JSON via stdin ─────────── */
 function runSorter(exePath, inputJSON) {
@@ -49,9 +49,9 @@ function runSorter(exePath, inputJSON) {
             ));
         }
 
-        const proc   = spawn(exePath);
-        let   output = '';
-        let   errOut = '';
+        const proc = spawn(exePath);
+        let output = '';
+        let errOut = '';
 
         proc.stdout.on('data', chunk => { output += chunk.toString(); });
         proc.stderr.on('data', chunk => { errOut += chunk.toString(); });
@@ -96,13 +96,13 @@ app.post('/students', (req, res) => {
         return res.status(400).json({ error: 'Roll number must be a valid number.' });
     }
     if (marks === undefined || isNaN(Number(marks)) ||
-        Number(marks) < 0  || Number(marks) > 100) {
+        Number(marks) < 0 || Number(marks) > 100) {
         return res.status(400).json({ error: 'Marks must be between 0 and 100.' });
     }
 
     const student = {
-        name:  name.trim(),
-        roll:  Number(roll),
+        name: name.trim(),
+        roll: Number(roll),
         marks: Number(marks)
     };
 
@@ -111,7 +111,9 @@ app.post('/students', (req, res) => {
     console.log(`[ADD] ${student.name} | Roll: ${student.roll} | Marks: ${student.marks}`);
     res.status(201).json({ message: 'Student added successfully.', student });
 });
-
+app.get("/", (req, res) => {
+    res.send("Student Sorting Dashboard is running successfully!");
+});
 /**
  * GET /students
  * Returns all students in insertion order.
